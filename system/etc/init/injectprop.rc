@@ -1,11 +1,20 @@
 on post-fs-data
     # reset sensitive props
-    exec u:r:su:s0 root root -- /system/bin/injectprop --sensitive-props
-    exec u:r:sysinit:s0 root root -- /system/bin/injectprop --sensitive-props
-    exec u:r:su:s0 root root -- /system/bin/sh /system/bin/injectprop.sh
-    exec u:r:sysinit:s0 root root -- /system/bin/sh /system/bin/injectprop.sh
+    start safeprops
+    start injectprops
+
+service safeprops /system/bin/injectprop --sensitive-props
+    user root
+    seclabel u:r:su:s0
+    oneshot
+
+service injectprops /system/bin/sh /system/bin/injectprop.sh
+    user root
+    seclabel u:r:su:s0
+    oneshot
+
 
 on property:sys.boot_completed=1
     # reset sensitive props (late)
-    exec u:r:su:s0 root root -- /system/bin/injectprop --sensitive-props
-    exec u:r:sysinit:s0 root root -- /system/bin/injectprop --sensitive-props
+    start safeprops
+
