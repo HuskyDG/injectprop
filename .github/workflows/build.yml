@@ -22,6 +22,7 @@ jobs:
         unzip android-ndk-r23b-linux.zip
     - name: Build injectprop
       run: |
+        chmod 777 ./build.sh
         mkdir -p bin system/bin system/etc/init
         ANDROID_NDK_HOME=./android-ndk-r23b CXX=aarch64-linux-android31-clang++ ./build.sh bin/injectprop_arm64
         ANDROID_NDK_HOME=./android-ndk-r23b CXX=armv7a-linux-androideabi31-clang++ ./build.sh bin/injectprop_arm
