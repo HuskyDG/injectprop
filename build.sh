@@ -1,7 +1,6 @@
 #!/bin/bash
 
 NAME="$1"
-[ -z "$NAME" ] && NAME=injectprop
 set -e
 
 export PATH=${PATH}:${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
