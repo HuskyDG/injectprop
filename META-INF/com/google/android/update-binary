@@ -1,0 +1,137 @@
+#!/sbin/sh
+
+
+OUTFD=/proc/self/fd/$2;
+ZIPFILE="$3";
+
+BOOTMODE=false;
+ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true;
+$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true;
+
+DIR=/sdcard;
+$BOOTMODE || DIR=$(dirname "$ZIPFILE");
+
+grep_prop() {
+  local REGEX="s/^$1=//p"
+  shift
+  local FILES=$@
+  [ -z "$FILES" ] && FILES='/system/build.prop'
+  cat $FILES 2>/dev/null | dos2unix | sed -n "$REGEX" | head -n 1
+}
+
+grep_get_prop() {
+  local result=$(grep_prop $@)
+  if [ -z "$result" ]; then
+    # Fallback to getprop
+    getprop "$1"
+  else
+    echo $result
+  fi
+}
+
+api_level_arch_detect() {
+  API=$(grep_get_prop ro.build.version.sdk)
+  ABI=$(grep_get_prop ro.product.cpu.abi)
+  if [ "$ABI" = "x86" ]; then
+    ARCH=x86
+    ABI32=x86
+    IS64BIT=false
+  elif [ "$ABI" = "arm64-v8a" ]; then
+    ARCH=arm64
+    ABI32=armeabi-v7a
+    IS64BIT=true
+  elif [ "$ABI" = "x86_64" ]; then
+    ARCH=x64
+    ABI32=x86
+    IS64BIT=true
+  else
+    ARCH=arm
+    ABI=armeabi-v7a
+    ABI32=armeabi-v7a
+    IS64BIT=false
+  fi
+}
+
+
+recovery_cleanup() {
+  local DIR
+  ui_print "- Unmounting partitions"
+  (umount_apex
+  if [ ! -d /postinstall/tmp ]; then
+    umount -l /system
+    umount -l /system_root
+  fi
+  umount -l /vendor
+  umount -l /persist
+  umount -l /metadata
+  for DIR in /apex /system /system_root; do
+    if [ -L "${DIR}_link" ]; then
+      rmdir $DIR
+      mv -f ${DIR}_link $DIR
+    fi
+  done
+  umount -l /dev/random) 2>/dev/null
+}
+
+
+
+ui_print(){
+if [ "$BOOTMODE" == true ]; then echo "$1"; else echo "ui_print $1">$OUTFD; echo "ui_print" >$OUTFD; fi
+}
+
+abort() {
+  ui_print "$1"
+  $BOOTMODE || recovery_cleanup
+  [ ! -z $MODPATH ] && rm -rf $MODPATH
+  rm -rf $TMPDIR
+  exit 1
+}
+
+ui_print "******************************"
+ui_print "  Injectprop by HuskyDG"
+ui_print "******************************"
+api_level_arch_detect
+ui_print "- System architecture: $ARCH"
+sleep 1
+
+ui_print "- Mount system partition as read-write"
+if [ "$BOOTMODE" == true ]; then
+    mount -o rw,remount /system
+    mount -o rw,rwmount /system_root
+    mount -o rw,remount /
+else
+    mount /system
+    mount /system_root
+    mount -o rw,remount /system
+    mount -o rw,remount /system_root
+fi
+
+rm -rf /system/.rw
+touch /system/.rw || abort "! Installation failed"
+rm -rf /system/.rw
+
+ui_print "- Extract system files"
+rm -rf /dev/tmp
+mkdir -p /dev/tmp
+TMPDIR=/dev/tmp
+unzip -o "$ZIPFILE" -d "$TMPDIR" || abort "! Installation failed"
+# copy files to system
+cp -af $TMPDIR/system/* /system || abort "! Installation failed"
+
+ui_print "- Setup injectprop binary"
+rm -rf /system/bin/injectprop
+cp -f "$TMPDIR/bin/injectprop_$ARCH" "/system/bin/injectprop" || abort "! Installation failed"
+if [ -d "/system/addon.d" ]; then
+    ui_print "- Setup injectprop addon.d"
+    cp -f $TMPDIR/addon.d/* /system/addon.d
+fi
+
+ui_print "- Setup permission"
+chmod 755 /system/bin/injectprop
+chmod 666 /system/etc/init/injectprop.rc
+if [ "$BOOTMODE" == false ]; then
+    ui_print "- Clean up"
+    recovery_cleanup
+fi
+rm -rf "$TMPDIR"
+ui_print "- All done!"
