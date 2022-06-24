@@ -77,6 +77,7 @@ void reset_sensitive_props(){
     auto hwcountry = getprop("ro.boot.hwcountry");
     if (!hwcountry.empty() && str_contains(hwcountry, "China"))
         setprop("ro.boot.hwcountry", "GLOBAL", false);
+    __system_property_del("ro.build.selinux");
 
 }
 
@@ -97,17 +98,20 @@ Usage: %s NAME VALUE\n\
    return 0;
    }
 
-   
+   const auto is_delete = strcmp(argv[1], "--delete") == 0;
+
    const auto is_sensitive_props = strcmp(argv[1], "--sensitive-props") == 0;
 
    if (is_sensitive_props) {
         printf("Reset sensitive props\n");
         reset_sensitive_props();
-        return 0;
     }
-   
-
-    setprop(argv[1],argv[2], true);
+    else if (is_delete){
+        if (argc==3) __system_property_del(argv[2]);
+        else return 1;
+    }
+    else
+        setprop(argv[1],argv[2], true);
 
     return 0;
 }
