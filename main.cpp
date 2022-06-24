@@ -14,7 +14,6 @@ using namespace std;
 #include <system_properties/prop_area.h>
 #include <system_properties/system_properties.h>
 
-#include "private/bionic_defs.h"
 
 static SystemProperties system_properties;
 static_assert(__is_trivially_constructible(SystemProperties),
