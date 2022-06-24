@@ -1,6 +1,14 @@
 name: build
 
-on: [push, pull_request, workflow_dispatch ]
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'initrd/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,7 +26,7 @@ jobs:
         ANDROID_NDK_HOME=./android-ndk-r23b CXX=aarch64-linux-android31-clang++ ./build.sh bin/injectprop_arm64
         ANDROID_NDK_HOME=./android-ndk-r23b CXX=armv7a-linux-androideabi31-clang++ ./build.sh bin/injectprop_arm
         ANDROID_NDK_HOME=./android-ndk-r23b CXX=i686-linux-android31-clang++ ./build.sh bin/injectprop_x86
-       ANDROID_NDK_HOME=./android-ndk-r23b CXX=x86_64-linux-android31-clang++ ./build.sh bin/injectprop_x64
+        ANDROID_NDK_HOME=./android-ndk-r23b CXX=x86_64-linux-android31-clang++ ./build.sh bin/injectprop_x64
       
     - uses: actions/upload-artifact@v1
       with:
