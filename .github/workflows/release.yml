@@ -11,4 +11,17 @@ jobs:
    release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1.0.0
+     - uses: actions/checkout@v1.0.0
+      
+     - name: Repack zip
+       run: zip -r injectprop.zip META-INF/* system/* addon.d/* bin/*
+
+     - uses: marvinpinto/action-automatic-releases@latest
+      if: github.ref == 'refs/heads/main'
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        title: "${{ env.GITHUB_SHA }}"
+        files: |
+            injectprop.zip
