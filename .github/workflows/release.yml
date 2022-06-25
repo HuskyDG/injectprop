@@ -4,7 +4,7 @@ on: [ workflow_dispatch ]
 
 jobs:
    build: 
-     uses: huskydg/injectprop/.github/workflows/build.yml@main
+     uses: HuskyDG/injectprop/.github/workflows/build.yml@main
      with:
       branch: main
 
