@@ -64,9 +64,10 @@ if [ "$inject_props" == 1 ]; then
     injectprop ro${n}build.version.release "$BUILD_VERSION_RELEASE"
     injectprop ro${n}build.version.release_or_codename "$BUILD_VERSION_RELEASE_OR_CODENAME"
   done
+  if [ "$killgms" == 1 ]; then
+    killall -9 com.google.android.gms
+    killall -9 com.android.vending
+  fi
 fi
 
-if [ "$killgms" == 1 ]; then
-  killall -9 com.google.android.gms
-  killall -9 com.android.vending
-fi
+
