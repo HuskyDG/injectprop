@@ -28,16 +28,17 @@ bool setprop(char const prop[], char const value[], bool add = false) {
     auto pi = (prop_info *) __system_property_find(prop);
 
     if (pi != nullptr) {
-        if (__system_property_update(pi, value, strlen(value))){
+        if (__system_property_update(pi, value, strlen(value))==0){
             printf("modify prop [%s]: [%s]\n",prop,value);
             return true;
-        } else return false;
+        }
     } else if (add) {
-        if (__system_property_add(prop, strlen(prop), value, strlen(value))){
+        if (__system_property_add(prop, strlen(prop), value, strlen(value))==0){
             printf("create prop [%s]: [%s]\n",prop,value);
             return true;
-        } else return false;
+        }
     }
+    return false;
 }
 
 bool setprop(const std::vector<std::string> &props, char const value[], bool add = false) {
@@ -115,13 +116,16 @@ Usage: %s NAME VALUE\n\
    if (is_sensitive_props) {
         printf("Reset sensitive props\n");
         reset_sensitive_props();
-        return 0;
-    }
-   
-
-    if (!setprop(argv[1],argv[2], true))
-        fprintf(stderr, "setprop failed\n");
-;
+   }
+   else if (argc<3){
+        fprintf(stderr, "prop value is missing");
+        return 1;
+   }
+   else {
+       if (!setprop(argv[1],argv[2], true)){
+           fprintf(stderr, "setprop failed\n");
+           return -1;
+       }
 
     return 0;
 }
