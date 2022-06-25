@@ -12,7 +12,10 @@ using namespace std;
 
 std::string getprop(char const prop[]){
     char value[255];
-    __system_property_get(prop,value);
+    if (__system_property_get(prop,value))
+        printf("getprop: [%s]: [%s]\n",prop,value);
+    else
+        printf("prop [%s] does not exist\n",prop);
     return std::string(value);
 }
 
@@ -25,8 +28,10 @@ void setprop(char const prop[], char const value[], bool add = false) {
     auto pi = (prop_info *) __system_property_find(prop);
 
     if (pi != nullptr) {
+        printf("modify prop [%s]: [%s]\n",prop,value);
         __system_property_update(pi, value, strlen(value));
     } else if (add) {
+        printf("create prop [%s]: [%s]\n",prop,value);
         __system_property_add(prop, strlen(prop), value, strlen(value));
     }
 }
@@ -83,11 +88,6 @@ void reset_sensitive_props(){
 
 
 int main(int argc, char *argv[]) {
-    if (__system_properties_init()) {
-        return -1;
-    }
-
-
    if (argc==1){
        printf("\
 inject system properties tool\n\
@@ -96,6 +96,13 @@ Usage: %s NAME VALUE\n\
    or: %s --sensitive-props\n", argv[0], argv[0]);
    return 0;
    }
+
+
+   if (__system_properties_init()) {
+        printf("__system_properties_init error");
+        return -1;
+   }
+
 
    
    const auto is_sensitive_props = strcmp(argv[1], "--sensitive-props") == 0;
