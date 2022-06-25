@@ -121,11 +121,10 @@ Usage: %s NAME VALUE\n\
         fprintf(stderr, "prop value is missing");
         return 1;
    }
-   else {
-       if (!setprop(argv[1],argv[2], true)){
+   else if (!setprop(argv[1],argv[2], true)){
            fprintf(stderr, "setprop failed\n");
            return -1;
-       }
+   }
 
-    return 0;
+   return 0;
 }
