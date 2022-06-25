@@ -4,7 +4,7 @@ Inject Android system properties, allow you to pass SafetyNet on Custom ROM with
 
 ## Usage
 
-- Download zip and extract, configure information in `system/bin/injectprop.sh`, repack as zip and flash it through Custom Recovery (TWRP).
+- Download zip from [here](https://github.com/HuskyDG/injectprop/releases/tag/latest)  and extract, configure information in `system/bin/injectprop.sh`, repack as zip and flash it through Custom Recovery (TWRP).
 
 - Inject or hide sensitive properties:
 
