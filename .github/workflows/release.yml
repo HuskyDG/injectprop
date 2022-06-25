@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  build:
      runs-on: ubuntu-latest
      steps:
      - uses: huskydg/injectprop/.github/workflows/build.yml@main
