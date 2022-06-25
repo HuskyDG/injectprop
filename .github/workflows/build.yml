@@ -6,6 +6,8 @@ on:
     paths:
       - '**'
       - '.github/workflows/build.yml'
+    paths-ignore:
+      - 'README.md'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
