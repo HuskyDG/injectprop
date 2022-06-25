@@ -1,7 +1,10 @@
 # injectprop
+
 Inject Android system properties, allow you to pass SafetyNet on Custom ROM without Magisk.
 
 ## Usage
+
+- Download zip and extract, configure information in `system/bin/injectprop.sh`, repack as zip and flash it through Custom Recovery (TWRP).
 
 - Inject or hide sensitive properties:
 
