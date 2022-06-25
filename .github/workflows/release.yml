@@ -1,0 +1,26 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+     uses: huskydg/injectprop/.github/workflows/build.yml@main
+
+  release:
+     needs: build
+     runs-on: ubuntu-latest
+     steps:
+
+     - name: Repack zip
+       run: zip -r injectprop.zip META-INF/* system/* addon.d/* bin/*
+
+     - uses: marvinpinto/action-automatic-releases@latest
+      if: github.ref == 'refs/heads/master'
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        title: "${{ env.GITHUB_SHA }}"
+        files: |
+            injectprop.zip
