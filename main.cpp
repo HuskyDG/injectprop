@@ -35,7 +35,7 @@ bool setprop(char const prop[], char const value[], bool add = false) {
     } else if (add) {
         if (__system_property_add(prop, strlen(prop), value, strlen(value))){
             printf("create prop [%s]: [%s]\n",prop,value);
-            return true
+            return true;
         } else return false;
     }
 }
