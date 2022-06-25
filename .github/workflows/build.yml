@@ -3,9 +3,6 @@ name: build
 on:
   push:
     branches: [ main ]
-    paths:
-      - '**'
-      - '.github/workflows/build.yml'
     paths-ignore:
       - 'README.md'
   pull_request:
