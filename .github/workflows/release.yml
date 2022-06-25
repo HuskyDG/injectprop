@@ -3,11 +3,13 @@ name: release
 on: [ push , workflow_dispatch ]
 
 jobs:
+   build: 
+     uses: huskydg/injectprop/.github/workflows/build.yml@main
+
+
    release:
      runs-on: ubuntu-latest
      steps:
-     - uses: huskydg/injectprop/.github/workflows/build.yml@main
-
      - name: Repack zip
        run: zip -r injectprop.zip META-INF/* system/* addon.d/* bin/*
 
