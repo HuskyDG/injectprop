@@ -1,8 +1,9 @@
-name: build
+name: release
 
-on:  workflow_dispatch
+on: [ push , workflow_dispatch ]
 
 jobs:
+   release:
      runs-on: ubuntu-latest
      steps:
      - uses: huskydg/injectprop/.github/workflows/build.yml@main
