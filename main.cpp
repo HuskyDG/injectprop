@@ -118,7 +118,7 @@ Usage: %s NAME VALUE\n\
         reset_sensitive_props();
    }
    else if (argc<3){
-        fprintf(stderr, "prop value is missing");
+        fprintf(stderr, "prop value is missing\n");
         return 1;
    }
    else if (!setprop(argv[1],argv[2], true)){
