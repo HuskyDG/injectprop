@@ -24,22 +24,27 @@ static inline bool str_contains(std::string_view s, std::string_view ss) {
 }
 
 
-void setprop(char const prop[], char const value[], bool add = false) {
+bool setprop(char const prop[], char const value[], bool add = false) {
     auto pi = (prop_info *) __system_property_find(prop);
 
     if (pi != nullptr) {
-        printf("modify prop [%s]: [%s]\n",prop,value);
-        __system_property_update(pi, value, strlen(value));
+        if (__system_property_update(pi, value, strlen(value))){
+            printf("modify prop [%s]: [%s]\n",prop,value);
+            return true;
+        } else return false;
     } else if (add) {
-        printf("create prop [%s]: [%s]\n",prop,value);
-        __system_property_add(prop, strlen(prop), value, strlen(value));
+        if (__system_property_add(prop, strlen(prop), value, strlen(value))){
+            printf("create prop [%s]: [%s]\n",prop,value);
+            return true
+        } else return false;
     }
 }
 
-void setprop(const std::vector<std::string> &props, char const value[], bool add = false) {
+bool setprop(const std::vector<std::string> &props, char const value[], bool add = false) {
     for (const auto &prop : props) {
         setprop(prop.c_str(), value, add);
     }
+    return true;
 }
 
 
@@ -99,7 +104,7 @@ Usage: %s NAME VALUE\n\
 
 
    if (__system_properties_init()) {
-        printf("__system_properties_init error");
+        fprintf(stderr, "__system_properties_init error\n");
         return -1;
    }
 
@@ -114,7 +119,9 @@ Usage: %s NAME VALUE\n\
     }
    
 
-    setprop(argv[1],argv[2], true);
+    if (!setprop(argv[1],argv[2], true))
+        fprintf(stderr, "setprop failed\n");
+;
 
     return 0;
 }
